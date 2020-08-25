@@ -22,11 +22,28 @@ module OmniAuth
       end
 
       def raw_info
-        @raw_info ||= access_token.get('/api/3/accounts/current').parsed["account"] || {}
+        Rails.logger.error "run to here"
+        @raw_info ||= access_token.get('/api/3/accounts/current').parsed
+        Rails.logger.error "raw: #{@raw_info}"
+        @raw_info.parsed["account"] || {}
       end
 
       def callback_url
         full_host + script_name + callback_path
+      end
+
+      protected
+
+      def build_access_token
+        verifier = request.params["code"]
+        client.get_token(
+          {
+            grant_type: "authorization_code",
+            code: verifier,
+            redirect_uri: callback_url,
+          }.merge(token_params.to_hash(symbolize_keys: true)),
+          deep_symbolize(options.auth_token_params)
+        )
       end
     end
   end
