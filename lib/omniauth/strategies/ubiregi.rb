@@ -23,9 +23,9 @@ module OmniAuth
 
       def raw_info
         Rails.logger.error "run to here"
-        @raw_info ||= access_token.get('/api/3/accounts/current').parsed
+        @raw_info ||= access_token.get('/api/3/accounts/current').parsed["account"]
         Rails.logger.error "raw: #{@raw_info}"
-        @raw_info.parsed["account"] || {}
+        @raw_info
       end
 
       def callback_url
